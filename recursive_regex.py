@@ -13,7 +13,7 @@ class bcolors:
 PATTERN =  r"ho(.)a"
 SUB = 'hola'
 ASK_BEFORE = True
-DRY_RUN = True
+DRY_RUN = False
 
 with open('example.txt', 'rt') as file:
     file_str = file.read()
@@ -50,3 +50,6 @@ def sub_func(i):
 
 res_sub = re.sub(PATTERN, sub_func, file_str)
 print(res_sub)
+if not DRY_RUN:
+    with open('example.txt', 'wt') as file:
+        file.write(res_sub)
