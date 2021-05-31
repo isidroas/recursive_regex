@@ -13,7 +13,7 @@ class bcolors:
 PATTERN =  r"ho(.)a"
 SUB = 'hola'
 ASK_BEFORE = True
-DRY_RUN = False
+DRY_RUN = True
 
 with open('example.txt', 'rt') as file:
     file_str = file.read()
