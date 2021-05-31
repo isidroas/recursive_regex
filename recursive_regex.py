@@ -10,8 +10,10 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-PATTERN =  "ho.a"
-PATTERN =  r"(ho.a)"
+PATTERN =  r"ho(.)a"
+SUB = 'hola'
+ASK_BEFORE = True
+DRY_RUN = True
 
 with open('example.txt', 'rt') as file:
     file_str = file.read()
@@ -30,10 +32,21 @@ def get_successor(end:int, text_str:str):
         end = end + 1 
     return successor
 
+#pattern = re.compile(PATTERN)
+#for i in pattern.finditer(file_str):
 
-pattern = re.compile(PATTERN)
-for i in pattern.finditer(file_str):
-    #print(re.sub("(ho.a)",bcolors.OKBLUE+ "\g<0>"+ bcolors.ENDC, file_str))
-#    import pdb; pdb.set_trace()
-    res = get_preceding(i.start()-1,file_str) + bcolors.OKBLUE+ i[0] + bcolors.ENDC + get_successor(i.end(), file_str) 
-    print(res)
+def sub_func(i):
+        pre = get_preceding(i.start()-1,i.string)
+        suc = get_successor(i.end(), i.string) 
+        res = pre + bcolors.WARNING+ i[0] + bcolors.ENDC + suc
+        print(res)
+        print(' '* len(pre) + bcolors.OKBLUE + i.expand(SUB) + bcolors.ENDC)
+        if ASK_BEFORE:
+            skip = input('Do this substitution? [Y/n]')=='n'
+            if skip: 
+                return i.group(0)
+
+        return i.expand(SUB)
+
+res_sub = re.sub(PATTERN, sub_func, file_str)
+print(res_sub)
