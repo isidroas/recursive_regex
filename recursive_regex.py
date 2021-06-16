@@ -11,14 +11,13 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-PATTERN =  r"ho(.)a"
-SUB = 'hola'
+PATTERN =  r"Total Active Export"
+SUB = 'Active Energy Export (-A)'
 ASK_BEFORE = False
-DRY_RUN = True
-EXCLUDE = ['subdir2']
+DRY_RUN = False
+EXCLUDE = ['.git','.swp','__pycache__','.bin','zigbee_certification']
+FOLDER = '/home/isidro-trabajo/WSLW/robot_tests'
 
-with open('example.txt', 'rt') as file:
-    file_str = file.read()
 
 def get_preceding(start:int, text_str:str):
     preceding = ''
@@ -53,17 +52,19 @@ def sub_func(i):
 def process_file(path):
     with open(path, 'rt') as file:
         file_str = file.read()
-        res_sub = re.sub(PATTERN, sub_func, file_str)
-        print(res_sub)
+        res_sub = re.sub(PATTERN, sub_func, file_str, flags=re.IGNORECASE)
+        #print(res_sub)
     if not DRY_RUN:
         with open(path, 'wt') as file:
             file.write(res_sub)
 
-for root, subdirs, files in os.walk('./example'):
-    print(root)
-    if all([e in root for e in EXCLUDE]):
+for root, subdirs, files in os.walk(FOLDER):
+    #print(root)
+    if any([e in root for e in EXCLUDE]):
         continue
     for file in files:
+        if any([e in file for e in EXCLUDE]):
+            continue
         path = os.path.join(root,file)
-        print(path)
+        #print(path)
         process_file(path)
