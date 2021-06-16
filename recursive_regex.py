@@ -1,4 +1,5 @@
 import re
+import os
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -12,8 +13,9 @@ class bcolors:
 
 PATTERN =  r"ho(.)a"
 SUB = 'hola'
-ASK_BEFORE = True
+ASK_BEFORE = False
 DRY_RUN = True
+EXCLUDE = ['subdir2']
 
 with open('example.txt', 'rt') as file:
     file_str = file.read()
@@ -48,8 +50,20 @@ def sub_func(i):
 
         return i.expand(SUB)
 
-res_sub = re.sub(PATTERN, sub_func, file_str)
-print(res_sub)
-if not DRY_RUN:
-    with open('example.txt', 'wt') as file:
-        file.write(res_sub)
+def process_file(path):
+    with open(path, 'rt') as file:
+        file_str = file.read()
+        res_sub = re.sub(PATTERN, sub_func, file_str)
+        print(res_sub)
+    if not DRY_RUN:
+        with open(path, 'wt') as file:
+            file.write(res_sub)
+
+for root, subdirs, files in os.walk('./example'):
+    print(root)
+    if all([e in root for e in EXCLUDE]):
+        continue
+    for file in files:
+        path = os.path.join(root,file)
+        print(path)
+        process_file(path)
