@@ -13,14 +13,16 @@ class bcolors:
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
 
+#class Parameters:
+#    def __init__(self, )
 
-#PATTERN = r"ho.a"
+
 PATTERN = r"ho.a."
 SUB = "adios"
 ASK_BEFORE = False
-DRY_RUN = False
+DRY_RUN = True
 EXCLUDE = [".git", ".swp", "__pycache__", ".bin", "zigbee_certification"]
-TARGET = "./tests/d1/d12/example.txt"
+TARGET = "./tests/"
 
 
 def get_preceding(start: int, text_str: str):
@@ -62,10 +64,14 @@ def sub_func(i):
 
 
 def process_file(path, pattern):
-    print(bcolors.UNDERLINE + bcolors.BOLD + bcolors.OKGREEN + path + bcolors.ENDC)
+    print('\n' + bcolors.UNDERLINE + bcolors.BOLD + bcolors.OKGREEN + path + bcolors.ENDC)
     with open(path, "rt") as file:
         file_str = file.read()
         res_sub, n_sub = re.subn(pattern, sub_func, file_str)
+        
+    if not n_sub:
+        # delete last printed line (name of file)
+        print('\033[F' + '\033[K')
     if not DRY_RUN and n_sub:
         with open(path, "wt") as file:
             file.write(res_sub)
