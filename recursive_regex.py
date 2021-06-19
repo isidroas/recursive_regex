@@ -16,7 +16,7 @@ SUB = 'Active Energy Export (-A)'
 ASK_BEFORE = False
 DRY_RUN = False
 EXCLUDE = ['.git','.swp','__pycache__','.bin','zigbee_certification']
-FOLDER = '/home/isidro-trabajo/WSLW/robot_tests'
+TARGET = '/home/isidro-trabajo/WSLW/robot_tests'
 
 
 def get_preceding(start:int, text_str:str):
@@ -33,9 +33,6 @@ def get_successor(end:int, text_str:str):
         end = end + 1 
     return successor
 
-#pattern = re.compile(PATTERN)
-#for i in pattern.finditer(file_str):
-
 def sub_func(i):
         pre = get_preceding(i.start()-1,i.string)
         suc = get_successor(i.end(), i.string) 
@@ -49,7 +46,7 @@ def sub_func(i):
 
         return i.expand(SUB)
 
-def process_file(path):
+def process_file(path, pattern):
     with open(path, 'rt') as file:
         file_str = file.read()
         res_sub = re.sub(PATTERN, sub_func, file_str, flags=re.IGNORECASE)
@@ -58,13 +55,18 @@ def process_file(path):
         with open(path, 'wt') as file:
             file.write(res_sub)
 
-for root, subdirs, files in os.walk(FOLDER):
-    #print(root)
-    if any([e in root for e in EXCLUDE]):
-        continue
-    for file in files:
-        if any([e in file for e in EXCLUDE]):
-            continue
-        path = os.path.join(root,file)
-        #print(path)
-        process_file(path)
+
+if __name__ == '__main__':
+    pattern = re.compile(PATTERN)
+    if os.path.isdir(TARGET):
+        for root, subdirs, files in os.walk(TARGET):
+            if any([e in root for e in EXCLUDE]):
+                continue
+            for file in files:
+                if any([e in file for e in EXCLUDE]):
+                    continue
+                path = os.path.join(root,file)
+                #print(path)
+                process_file(path, pattern)
+    else:
+        process_file(path, pattern)
