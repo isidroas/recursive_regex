@@ -1,5 +1,9 @@
 import re
 import os
+import yaml
+import argparse
+from typing import List
+
 
 
 class bcolors:
@@ -13,16 +17,29 @@ class bcolors:
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
 
-#class Parameters:
-#    def __init__(self, )
+
+class Parameters:
+    def __init__(
+        self,
+        pattern,
+        substitution,
+        case_insensitive=False,
+        exclude_dirs=[],
+        exclude_files=[],
+        ask_before=False,
+    ):
+        self.pattern: str = pattern
+        self.substitution: str = substitution
+        self.case_insensitive: bool = case_insensitive
+        self.exclude_dirs: List[str] = exclude_dirs
+        self.exclude_files: List[str] = exclude_files
+        self.ask_before: bool = ask_before
 
 
-PATTERN = r"ho.a."
 SUB = "adios"
 ASK_BEFORE = False
 DRY_RUN = True
-EXCLUDE = [".git", ".swp", "__pycache__", ".bin", "zigbee_certification"]
-TARGET = "./tests/"
+#TARGET = "./tests/"
 
 
 def get_preceding(start: int, text_str: str):
@@ -64,29 +81,47 @@ def sub_func(i):
 
 
 def process_file(path, pattern):
-    print('\n' + bcolors.UNDERLINE + bcolors.BOLD + bcolors.OKGREEN + path + bcolors.ENDC)
+    print(
+        "\n" + bcolors.UNDERLINE + bcolors.BOLD + bcolors.OKGREEN + path + bcolors.ENDC
+    )
     with open(path, "rt") as file:
         file_str = file.read()
         res_sub, n_sub = re.subn(pattern, sub_func, file_str)
-        
+
     if not n_sub:
         # delete last printed line (name of file)
-        print('\033[F' + '\033[K')
+        print("\033[F" + "\033[K")
     if not DRY_RUN and n_sub:
         with open(path, "wt") as file:
             file.write(res_sub)
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description = 'Recursive REGEX')
+    parser.add_argument('target', help='path of the file or directory to search')
+    parser.add_argument('--dry-run', action='store_true')
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    pattern = re.compile(PATTERN, flags=re.IGNORECASE)
-    if os.path.isdir(TARGET):
-        for root, subdirs, files in os.walk(TARGET):
-            if any([e in root for e in EXCLUDE]):
+
+    args = parse_arguments()
+    print(args.__dict__)
+    with open('rere_parameters.yaml') as file:
+        param_dict = yaml.load(file)
+
+    params = Parameters(**param_dict)
+    if params.case_insensitive:
+        pattern = re.compile(params.pattern, flags=re.IGNORECASE)
+    else:
+        pattern = re.compile(params.pattern)
+
+    if os.path.isdir(args.target):
+        for root, subdirs, files in os.walk(args.target):
+            if any([e in root for e in params.exclude_dirs]):
                 continue
-            for file in files:
-                if any([e in file for e in EXCLUDE]):
+            for f in files:
+                if any([e in f for e in params.exclude_files]):
                     continue
-                path = os.path.join(root, file)
+                path = os.path.join(root, f)
                 process_file(path, pattern)
     else:
-        process_file(TARGET, pattern)
+        process_file(args.target, pattern)
