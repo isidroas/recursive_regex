@@ -36,11 +36,6 @@ class Parameters:
         self.ask_before: bool = ask_before
 
 
-SUB = "adios"
-ASK_BEFORE = False
-DRY_RUN = True
-#TARGET = "./tests/"
-
 
 def get_preceding(start: int, text_str: str):
     preceding = ""
@@ -62,7 +57,8 @@ def getNumberOfLines(str_):
     return len(str_.split("\n"))
 
 
-def sub_func(i):
+
+def sub_func(i, substitution, ask_before, ):
     pre = get_preceding(i.start() - 1, i.string)
     suc = get_successor(i.end(), i.string)
     res = pre + bcolors.WARNING + i[0] + bcolors.ENDC + suc
@@ -71,27 +67,27 @@ def sub_func(i):
     line_str = bcolors.FAIL + bcolors.BOLD + line + bcolors.ENDC
 
     print(line_str + res)
-    print(" " * len(line + pre) + bcolors.OKBLUE + i.expand(SUB) + bcolors.ENDC)
-    if ASK_BEFORE:
+    print(" " * len(line + pre) + bcolors.OKBLUE + i.expand(substitution) + bcolors.ENDC)
+    if ask_before:
         skip = input("Do this substitution? [Y/n]") == "n"
         if skip:
             return i.group(0)
 
-    return i.expand(SUB)
+    return i.expand(substitution)
 
 
-def process_file(path, pattern):
+def process_file(path, pattern, dry_run, sub_func1):
     print(
         "\n" + bcolors.UNDERLINE + bcolors.BOLD + bcolors.OKGREEN + path + bcolors.ENDC
     )
     with open(path, "rt") as file:
         file_str = file.read()
-        res_sub, n_sub = re.subn(pattern, sub_func, file_str)
+        res_sub, n_sub = re.subn(pattern, sub_func1, file_str)
 
     if not n_sub:
         # delete last printed line (name of file)
         print("\033[F" + "\033[K")
-    if not DRY_RUN and n_sub:
+    if not dry_run and n_sub:
         with open(path, "wt") as file:
             file.write(res_sub)
 
@@ -114,6 +110,8 @@ if __name__ == "__main__":
     else:
         pattern = re.compile(params.pattern)
 
+    sub_func_wrap = lambda i: sub_func(i, params.substitution, params.ask_before)
+
     if os.path.isdir(args.target):
         for root, subdirs, files in os.walk(args.target):
             if any([e in root for e in params.exclude_dirs]):
@@ -122,6 +120,6 @@ if __name__ == "__main__":
                 if any([e in f for e in params.exclude_files]):
                     continue
                 path = os.path.join(root, f)
-                process_file(path, pattern)
+                process_file(path, pattern, args.dry_run, sub_func_wrap)
     else:
-        process_file(args.target, pattern)
+        process_file(args.target, pattern, args.dry_run, sub_func_wrap)

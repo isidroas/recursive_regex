@@ -1,5 +1,5 @@
 pattern:  "ho.a."
-substitution: "adios"
+substitution: "HOLA!"
 case_insensitive: False
 exclude_dirs:
     - ".git"
@@ -8,3 +8,4 @@ exclude_dirs:
 exclude_files:
     - ".swp"
     - ".bin"
+    - "example1"
