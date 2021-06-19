@@ -14,12 +14,12 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-PATTERN = r"Total Active Export"
-SUB = "Active Energy Export (-A)"
+PATTERN = r"ho.a"
+SUB = "HOLA!"
 ASK_BEFORE = False
-DRY_RUN = False
+DRY_RUN = True
 EXCLUDE = [".git", ".swp", "__pycache__", ".bin", "zigbee_certification"]
-TARGET = "/home/isidro-trabajo/WSLW/robot_tests"
+TARGET = "./example.txt"
 
 
 def get_preceding(start: int, text_str: str):
@@ -38,12 +38,20 @@ def get_successor(end: int, text_str: str):
     return successor
 
 
+def getNumberOfLines(str_):
+    return len(str_.split("\n"))
+
+
 def sub_func(i):
     pre = get_preceding(i.start() - 1, i.string)
     suc = get_successor(i.end(), i.string)
     res = pre + bcolors.WARNING + i[0] + bcolors.ENDC + suc
-    print(res)
-    print(" " * len(pre) + bcolors.OKBLUE + i.expand(SUB) + bcolors.ENDC)
+
+    line = str(getNumberOfLines(i.string[: i.start()])) + ": "
+    line_str = bcolors.FAIL + bcolors.BOLD + line + bcolors.ENDC
+
+    print(line_str + res)
+    print(" " * len(line + pre) + bcolors.OKBLUE + i.expand(SUB) + bcolors.ENDC)
     if ASK_BEFORE:
         skip = input("Do this substitution? [Y/n]") == "n"
         if skip:
@@ -53,17 +61,17 @@ def sub_func(i):
 
 
 def process_file(path, pattern):
+    print(bcolors.UNDERLINE + bcolors.BOLD + bcolors.OKGREEN + path + bcolors.ENDC)
     with open(path, "rt") as file:
         file_str = file.read()
-        res_sub = re.sub(PATTERN, sub_func, file_str, flags=re.IGNORECASE)
-        # print(res_sub)
+        res_sub = re.sub(pattern, sub_func, file_str)
     if not DRY_RUN:
         with open(path, "wt") as file:
             file.write(res_sub)
 
 
 if __name__ == "__main__":
-    pattern = re.compile(PATTERN)
+    pattern = re.compile(PATTERN, flags=re.IGNORECASE)
     if os.path.isdir(TARGET):
         for root, subdirs, files in os.walk(TARGET):
             if any([e in root for e in EXCLUDE]):
@@ -72,7 +80,6 @@ if __name__ == "__main__":
                 if any([e in file for e in EXCLUDE]):
                     continue
                 path = os.path.join(root, file)
-                # print(path)
                 process_file(path, pattern)
     else:
-        process_file(path, pattern)
+        process_file(TARGET, pattern)
