@@ -5,7 +5,6 @@ import argparse
 from typing import List
 
 
-
 class bcolors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
@@ -36,7 +35,6 @@ class Parameters:
         self.ask_before: bool = ask_before
 
 
-
 def get_preceding(start: int, text_str: str):
     preceding = ""
     while start >= 0 and text_str[start] != "\n":
@@ -57,8 +55,7 @@ def getNumberOfLines(str_):
     return len(str_.split("\n"))
 
 
-
-def sub_func(i, substitution, ask_before, ):
+def sub_func(i, substitution, ask_before):
     pre = get_preceding(i.start() - 1, i.string)
     suc = get_successor(i.end(), i.string)
     res = pre + bcolors.WARNING + i[0] + bcolors.ENDC + suc
@@ -67,7 +64,9 @@ def sub_func(i, substitution, ask_before, ):
     line_str = bcolors.FAIL + bcolors.BOLD + line + bcolors.ENDC
 
     print(line_str + res)
-    print(" " * len(line + pre) + bcolors.OKBLUE + i.expand(substitution) + bcolors.ENDC)
+    print(
+        " " * len(line + pre) + bcolors.OKBLUE + i.expand(substitution) + bcolors.ENDC
+    )
     if ask_before:
         skip = input("Do this substitution? [Y/n]") == "n"
         if skip:
@@ -91,17 +90,19 @@ def process_file(path, pattern, dry_run, sub_func1):
         with open(path, "wt") as file:
             file.write(res_sub)
 
+
 def parse_arguments():
-    parser = argparse.ArgumentParser(description = 'Recursive REGEX')
-    parser.add_argument('target', help='path of the file or directory to search')
-    parser.add_argument('--dry-run', action='store_true')
+    parser = argparse.ArgumentParser(description="Recursive REGEX")
+    parser.add_argument("target", help="path of the file or directory to search")
+    parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
+
 
 if __name__ == "__main__":
 
     args = parse_arguments()
     print(args.__dict__)
-    with open('rere_parameters.yaml') as file:
+    with open("rere_parameters.yaml") as file:
         param_dict = yaml.load(file)
 
     params = Parameters(**param_dict)
