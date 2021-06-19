@@ -14,12 +14,13 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-PATTERN = r"ho.a"
-SUB = "HOLA!"
+#PATTERN = r"ho.a"
+PATTERN = r"ho.a."
+SUB = "adios"
 ASK_BEFORE = False
-DRY_RUN = True
+DRY_RUN = False
 EXCLUDE = [".git", ".swp", "__pycache__", ".bin", "zigbee_certification"]
-TARGET = "./tests/d1"
+TARGET = "./tests/d1/d12/example.txt"
 
 
 def get_preceding(start: int, text_str: str):
