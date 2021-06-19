@@ -19,7 +19,7 @@ SUB = "HOLA!"
 ASK_BEFORE = False
 DRY_RUN = True
 EXCLUDE = [".git", ".swp", "__pycache__", ".bin", "zigbee_certification"]
-TARGET = "./example.txt"
+TARGET = "./tests/d1"
 
 
 def get_preceding(start: int, text_str: str):
@@ -64,8 +64,8 @@ def process_file(path, pattern):
     print(bcolors.UNDERLINE + bcolors.BOLD + bcolors.OKGREEN + path + bcolors.ENDC)
     with open(path, "rt") as file:
         file_str = file.read()
-        res_sub = re.sub(pattern, sub_func, file_str)
-    if not DRY_RUN:
+        res_sub, n_sub = re.subn(pattern, sub_func, file_str)
+    if not DRY_RUN and n_sub:
         with open(path, "wt") as file:
             file.write(res_sub)
 
