@@ -36,6 +36,11 @@ class Parameters:
 
 
 def get_preceding(start: int, text_str: str):
+    """
+    >>> get_preceding(10, 'hola\\nadios que pasa\\n otra linea')
+    'adios '
+    """
+
     preceding = ""
     while start >= 0 and text_str[start] != "\n":
         preceding = text_str[start] + preceding
