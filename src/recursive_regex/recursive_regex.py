@@ -103,8 +103,8 @@ def parse_arguments():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
 
+def main():
     args = parse_arguments()
     print(args.__dict__)
     with open("rere_parameters.yaml") as file:
@@ -129,3 +129,6 @@ if __name__ == "__main__":
                 process_file(path, pattern, args.dry_run, sub_func_wrap)
     else:
         process_file(args.target, pattern, args.dry_run, sub_func_wrap)
+
+if __name__ == "__main__":
+    main()
