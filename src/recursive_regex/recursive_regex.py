@@ -49,6 +49,10 @@ def get_preceding(start: int, text_str: str):
 
 
 def get_successor(end: int, text_str: str):
+    """
+    >>> get_successor(10, 'hola\\nadios que pasa\\n otra linea')
+    'ue pasa'
+    """
     successor = ""
     while end < len(text_str) and text_str[end] != "\n":
         successor = successor + text_str[end]
