@@ -1,5 +1,4 @@
-.. image:: https://pypip.in/v/recursive_regex/badge.svg
-        :target: https://pypi.python.org/pypi/recursive_regex/
+[![pypi](https://pypip.in/v/recursive_regex/badge.svg)](https://pypi.python.org/pypi/recursive_regex/)
 
 # Recursive REGEX
 
