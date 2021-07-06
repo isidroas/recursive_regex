@@ -114,14 +114,18 @@ def parse_arguments():
         "target", help="path of the file or directory to search"
     )
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--config-file", "-c", help="yaml file where config is stored"
+    )
     return parser.parse_args()
 
 
 def main():
     args = parse_arguments()
     print(args.__dict__)
-    with open("rere_parameters.yaml") as file:
-        param_dict = yaml.load(file)
+    if args.config_file:
+        with open(args.config_file) as file:
+            param_dict = yaml.load(file)
 
     params = Parameters(**param_dict)
     if params.case_insensitive:
@@ -139,8 +143,9 @@ def main():
             for f in files:
                 if any([e in f for e in params.exclude_files]):
                     continue
-                path = os.path.join(root, f)
-                process_file(path, pattern, args.dry_run, sub_func_wrap)
+                process_file(
+                    os.path.join(root, f), pattern, args.dry_run, sub_func_wrap
+                )
     else:
         process_file(args.target, pattern, args.dry_run, sub_func_wrap)
 
