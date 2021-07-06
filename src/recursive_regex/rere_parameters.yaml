@@ -1,11 +1,11 @@
-pattern:  "ho.a."
-substitution: "HOLA!"
+pattern:  ho.a.
+substitution: HOLA!
 case_insensitive: False
 exclude_dirs:
-    - ".git"
-    - "__pycache__"
-    - "zigbee_certification"
+    - .git
+    - __pycache__
+    - zigbee_certification
 exclude_files:
-    - ".swp"
-    - ".bin"
-    - "example1"
+    - .swp
+    - .bin
+    - example1
