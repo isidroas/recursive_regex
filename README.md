@@ -1,3 +1,6 @@
+.. image:: https://pypip.in/v/recursive_regex/badge.svg
+        :target: https://pypi.python.org/pypi/recursive_regex/
+
 # Recursive REGEX
 
 Search an regular expresion recursively in a folder and substitute.
