@@ -74,7 +74,10 @@ def sub_func(i, substitution, ask_before):
 
     print(line_str + res)
     print(
-        " " * len(line + pre) + bcolors.OKBLUE + i.expand(substitution) + bcolors.ENDC
+        " " * len(line + pre)
+        + bcolors.OKBLUE
+        + i.expand(substitution)
+        + bcolors.ENDC
     )
     if ask_before:
         skip = input("Do this substitution? [Y/n]") == "n"
@@ -86,7 +89,12 @@ def sub_func(i, substitution, ask_before):
 
 def process_file(path, pattern, dry_run, sub_func1):
     print(
-        "\n" + bcolors.UNDERLINE + bcolors.BOLD + bcolors.OKGREEN + path + bcolors.ENDC
+        "\n"
+        + bcolors.UNDERLINE
+        + bcolors.BOLD
+        + bcolors.OKGREEN
+        + path
+        + bcolors.ENDC
     )
     with open(path, "rt") as file:
         file_str = file.read()
@@ -102,7 +110,9 @@ def process_file(path, pattern, dry_run, sub_func1):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Recursive REGEX")
-    parser.add_argument("target", help="path of the file or directory to search")
+    parser.add_argument(
+        "target", help="path of the file or directory to search"
+    )
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -119,7 +129,8 @@ def main():
     else:
         pattern = re.compile(params.pattern)
 
-    sub_func_wrap = lambda i: sub_func(i, params.substitution, params.ask_before)
+    def sub_func_wrap(i):
+        return sub_func(i, params.substitution, params.ask_before)
 
     if os.path.isdir(args.target):
         for root, subdirs, files in os.walk(args.target):
