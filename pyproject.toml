@@ -9,4 +9,6 @@ build-backend = "setuptools.build_meta"
 line-length = 79
 
 [tool.flake8]
-ignore = "pseudo.py"
+exclude = "pseudo.py"
+#exclude =
+#    pseudo.py
