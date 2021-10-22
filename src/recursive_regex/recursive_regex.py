@@ -37,6 +37,9 @@ class Parameters:
 
 def get_preceding(start: int, text_str: str):
     """
+    Given a position on a string, it returns all of the characters between
+    that position and the previous line break.
+
     >>> get_preceding(10, 'hola\\nadios que pasa\\n otra linea')
     'adios '
     """
@@ -50,6 +53,9 @@ def get_preceding(start: int, text_str: str):
 
 def get_successor(end: int, text_str: str):
     """
+    Given a position on a string, it returns all of the characters between
+    that position and the next line break.
+
     >>> get_successor(10, 'hola\\nadios que pasa\\n otra linea')
     'ue pasa'
     """
@@ -82,6 +88,7 @@ def sub_func(i, substitution, ask_before):
     if ask_before:
         skip = input("Do this substitution? [Y/n]") == "n"
         if skip:
+            # return the unchaged string.
             return i.group(0)
 
     return i.expand(substitution)
