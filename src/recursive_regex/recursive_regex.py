@@ -175,7 +175,7 @@ def process_file(path, pattern, dry_run, sub_func1):
             file.write(res_sub)
 
 
-def parse_arguments():
+def get_arguments():
     parser = argparse.ArgumentParser(description="Recursive REGEX")
     parser.add_argument(
         "target", help="path of the file or directory to search"
@@ -184,14 +184,13 @@ def parse_arguments():
     parser.add_argument(
         "--config-file", "-c", help="yaml file where config is stored"
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    return args.target, args.dry_run, args.config_file
 
 
-def main():
-    args = parse_arguments()
-    print(args.__dict__)
-    if args.config_file:
-        with open(args.config_file) as file:
+def main(target, dry_run, config_file):
+    if config_file:
+        with open(config_file) as file:
             param_dict = yaml.safe_load(file)
 
     params = Parameters(**param_dict)
@@ -203,19 +202,23 @@ def main():
     def sub_func_wrap(i):
         return sub_func(Match(i), params.substitution, params.ask_before)
 
-    if os.path.isdir(args.target):
-        for root, subdirs, files in os.walk(args.target):
+    if os.path.isdir(target):
+        for root, subdirs, files in os.walk(target):
             if any([e in root for e in params.exclude_dirs]):
                 continue
             for f in files:
                 if any([e in f for e in params.exclude_files]):
                     continue
                 process_file(
-                    os.path.join(root, f), pattern, args.dry_run, sub_func_wrap
+                    os.path.join(root, f), pattern, dry_run, sub_func_wrap
                 )
     else:
-        process_file(args.target, pattern, args.dry_run, sub_func_wrap)
+        process_file(target, pattern, dry_run, sub_func_wrap)
+
+
+def run():
+    main(*get_arguments())
 
 
 if __name__ == "__main__":
-    main()
+    run()
