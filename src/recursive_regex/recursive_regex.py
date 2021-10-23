@@ -10,13 +10,6 @@ from typing import List
 #    return True
 
 
-def custom_conversion(match_obj: re.Match) -> str:
-    # ret = "[custom_conversion]"
-    unchanged_string = match_obj.group(0)
-
-    return unchanged_string * 2
-
-
 # TODO: remove it? this is only useful
 # when you want aditionaly, a regex_substitution
 # CUSTOM_POSTFILTER = custom_postfilter
@@ -133,14 +126,14 @@ class Match:
         return len(str_.split("\n"))
 
 
-def sub_func(i: Match, substitution, ask_before):
+def sub_func(i: Match, substitution, ask_before, custom_conversion):
 
     # if CUSTOM_POSTFILTER:
     #    if not CUSTOM_POSTFILTER(i):
     #        return i.original_capture
 
-    if CUSTOM_CONVERSION:
-        substitution_processed = CUSTOM_CONVERSION(i)
+    if custom_conversion:
+        substitution_processed = custom_conversion(i)
     else:
         substitution_processed = i.regex_substitute(substitution)
 
@@ -188,7 +181,7 @@ def get_arguments():
     return args.target, args.dry_run, args.config_file
 
 
-def main(target, dry_run, config_file):
+def main(target, dry_run, config_file, custom_conversion=None):
     if config_file:
         with open(config_file) as file:
             param_dict = yaml.safe_load(file)
@@ -200,7 +193,9 @@ def main(target, dry_run, config_file):
         pattern = re.compile(params.pattern)
 
     def sub_func_wrap(i):
-        return sub_func(Match(i), params.substitution, params.ask_before)
+        return sub_func(
+            Match(i), params.substitution, params.ask_before, custom_conversion
+        )
 
     if os.path.isdir(target):
         for root, subdirs, files in os.walk(target):
@@ -217,6 +212,9 @@ def main(target, dry_run, config_file):
 
 
 def run():
+    """
+    Run from command line
+    """
     main(*get_arguments())
 
 
