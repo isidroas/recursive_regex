@@ -37,6 +37,9 @@ class Match:
     def regex_substitute(self, substitution: str) -> str:
         pass
 
+    def print_context(self):
+        pass
+
 
 def sub_func(match_obj: Match) -> str:
     if CUSTOM_POSTFILTER:

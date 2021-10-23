@@ -4,6 +4,30 @@ import yaml
 import argparse
 from typing import List
 
+# def custom_postfilter(match_obj: re.Match) -> bool:
+#    unchanged_string = match_obj.group(0)
+#
+#    return True
+
+
+def custom_conversion(match_obj: re.Match) -> str:
+    # ret = "[custom_conversion]"
+    unchanged_string = match_obj.group(0)
+
+    return unchanged_string * 2
+
+
+# TODO: remove it? this is only useful
+# when you want aditionaly, a regex_substitution
+# CUSTOM_POSTFILTER = custom_postfilter
+# CUSTOM_POSTFILTER = None
+# name it ADITIONAL_FILTER ?
+
+
+# CUSTOM_CONVERSION = custom_conversion
+CUSTOM_CONVERSION = None
+# name it ADVANCED_SUBSTITUTION?
+
 
 class bcolors:
     HEADER = "\033[95m"
@@ -70,7 +94,7 @@ def getNumberOfLines(str_):
     return len(str_.split("\n"))
 
 
-def sub_func(i, substitution, ask_before):
+def sub_func(i: re.Match, substitution, ask_before):
     pre = get_preceding(i.start() - 1, i.string)
     suc = get_successor(i.end(), i.string)
     res = pre + bcolors.WARNING + i[0] + bcolors.ENDC + suc
@@ -78,20 +102,30 @@ def sub_func(i, substitution, ask_before):
     line = str(getNumberOfLines(i.string[: i.start()])) + ": "
     line_str = bcolors.FAIL + bcolors.BOLD + line + bcolors.ENDC
 
+    substitution_processed = i.expand(substitution)
+    unchanged_string = i.group(0)
+
+    # if CUSTOM_POSTFILTER:
+    #    if not CUSTOM_POSTFILTER(i):
+    #        return unchanged_string
+
+    if CUSTOM_CONVERSION:
+        return CUSTOM_CONVERSION(i)
+
     print(line_str + res)
     print(
         " " * len(line + pre)
         + bcolors.OKBLUE
-        + i.expand(substitution)
+        + substitution_processed
         + bcolors.ENDC
     )
     if ask_before:
         skip = input("Do this substitution? [Y/n]") == "n"
         if skip:
             # return the unchaged string.
-            return i.group(0)
+            return unchanged_string
 
-    return i.expand(substitution)
+    return substitution_processed
 
 
 def process_file(path, pattern, dry_run, sub_func1):
@@ -132,7 +166,7 @@ def main():
     print(args.__dict__)
     if args.config_file:
         with open(args.config_file) as file:
-            param_dict = yaml.load(file)
+            param_dict = yaml.safe_load(file)
 
     params = Parameters(**param_dict)
     if params.case_insensitive:
