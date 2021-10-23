@@ -59,71 +59,97 @@ class Parameters:
         self.ask_before: bool = ask_before
 
 
-def get_preceding(start: int, text_str: str):
-    """
-    Given a position on a string, it returns all of the characters between
-    that position and the previous line break.
+class Match:
+    def __init__(self, match: re.Match):
 
-    >>> get_preceding(10, 'hola\\nadios que pasa\\n otra linea')
-    'adios '
-    """
+        self.init_pos: int = match.start()
+        self.end_pos: int = match.end()
 
-    preceding = ""
-    while start >= 0 and text_str[start] != "\n":
-        preceding = text_str[start] + preceding
-        start = start - 1
-    return preceding
+        # The full file
+        self.string: str = match.string
+
+        # The regex groups
+        # self.groups: List[str]
+
+        # Unaltered caputured string
+        self.original_capture: str = match.group(0)
+
+        self._match = match
+
+    def regex_substitute(self, substitution: str) -> str:
+        return self._match.expand(substitution)
+
+    def print_context_and_substitution(self, substitution_processed):
+        pre = self._get_preceding(self.init_pos - 1, self.string)
+        suc = self._get_successor(self.end_pos, self.string)
+        res = (
+            pre + bcolors.WARNING + self.original_capture + bcolors.ENDC + suc
+        )
+
+        line = str(self._getNumberOfLines(self.string[: self.init_pos])) + ": "
+        line_str = bcolors.FAIL + bcolors.BOLD + line + bcolors.ENDC
+
+        print(line_str + res)
+        print(
+            " " * len(line + pre)
+            + bcolors.OKBLUE
+            + substitution_processed
+            + bcolors.ENDC
+        )
+
+    @staticmethod
+    def _get_preceding(start: int, text_str: str):
+        """
+        Given a position on a string, it returns all of the characters between
+        that position and the previous line break.
+
+        >>> _get_preceding(10, 'hola\\nadios que pasa\\n otra linea')
+        'adios '
+        """
+
+        preceding = ""
+        while start >= 0 and text_str[start] != "\n":
+            preceding = text_str[start] + preceding
+            start = start - 1
+        return preceding
+
+    @staticmethod
+    def _get_successor(end: int, text_str: str):
+        """
+        Given a position on a string, it returns all of the characters between
+        that position and the next line break.
+
+        >>> _get_successor(10, 'hola\\nadios que pasa\\n otra linea')
+        'ue pasa'
+        """
+        successor = ""
+        while end < len(text_str) and text_str[end] != "\n":
+            successor = successor + text_str[end]
+            end = end + 1
+        return successor
+
+    @staticmethod
+    def _getNumberOfLines(str_):
+        return len(str_.split("\n"))
 
 
-def get_successor(end: int, text_str: str):
-    """
-    Given a position on a string, it returns all of the characters between
-    that position and the next line break.
-
-    >>> get_successor(10, 'hola\\nadios que pasa\\n otra linea')
-    'ue pasa'
-    """
-    successor = ""
-    while end < len(text_str) and text_str[end] != "\n":
-        successor = successor + text_str[end]
-        end = end + 1
-    return successor
-
-
-def getNumberOfLines(str_):
-    return len(str_.split("\n"))
-
-
-def sub_func(i: re.Match, substitution, ask_before):
-    pre = get_preceding(i.start() - 1, i.string)
-    suc = get_successor(i.end(), i.string)
-    res = pre + bcolors.WARNING + i[0] + bcolors.ENDC + suc
-
-    line = str(getNumberOfLines(i.string[: i.start()])) + ": "
-    line_str = bcolors.FAIL + bcolors.BOLD + line + bcolors.ENDC
-
-    substitution_processed = i.expand(substitution)
-    unchanged_string = i.group(0)
+def sub_func(i: Match, substitution, ask_before):
 
     # if CUSTOM_POSTFILTER:
     #    if not CUSTOM_POSTFILTER(i):
-    #        return unchanged_string
+    #        return i.original_capture
 
     if CUSTOM_CONVERSION:
-        return CUSTOM_CONVERSION(i)
+        substitution_processed = CUSTOM_CONVERSION(i)
+    else:
+        substitution_processed = i.regex_substitute(substitution)
 
-    print(line_str + res)
-    print(
-        " " * len(line + pre)
-        + bcolors.OKBLUE
-        + substitution_processed
-        + bcolors.ENDC
-    )
+    i.print_context_and_substitution(substitution_processed)
+
     if ask_before:
         skip = input("Do this substitution? [Y/n]") == "n"
         if skip:
-            # return the unchaged string.
-            return unchanged_string
+            return i.original_capture
 
     return substitution_processed
 
@@ -175,7 +201,7 @@ def main():
         pattern = re.compile(params.pattern)
 
     def sub_func_wrap(i):
-        return sub_func(i, params.substitution, params.ask_before)
+        return sub_func(Match(i), params.substitution, params.ask_before)
 
     if os.path.isdir(args.target):
         for root, subdirs, files in os.walk(args.target):
