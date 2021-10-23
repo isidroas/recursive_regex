@@ -4,17 +4,21 @@ import yaml
 import argparse
 from typing import List
 
+
 # def custom_postfilter(match_obj: re.Match) -> bool:
 #    unchanged_string = match_obj.group(0)
 #
 #    return True
 
-
 # TODO: remove it? this is only useful
 # when you want aditionaly, a regex_substitution
 # CUSTOM_POSTFILTER = custom_postfilter
 # CUSTOM_POSTFILTER = None
+
 # name it ADITIONAL_FILTER ?
+
+# Sometimes is useful to not convert when it fails.
+# but in thas case, the 'original_capture' attribute could be used
 
 
 # CUSTOM_CONVERSION = custom_conversion
