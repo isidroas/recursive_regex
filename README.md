@@ -16,3 +16,6 @@ cd recursive_regex
 # Install in editable mode
 pip install -e .
 ```
+
+## Usage
+[![asciicast](https://asciinema.org/a/ZIZgLqzLaUqH13oP2VeJ7WgMf.svg)](https://asciinema.org/a/ZIZgLqzLaUqH13oP2VeJ7WgMf)
