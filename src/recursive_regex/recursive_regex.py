@@ -21,11 +21,7 @@ from typing import List
 # but in thas case, the 'original_capture' attribute could be used
 
 
-# CUSTOM_CONVERSION = custom_conversion
-CUSTOM_CONVERSION = None
-# name it ADVANCED_SUBSTITUTION?
-
-
+# TODO: there is too many line breaks printed in standard output
 class bcolors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
@@ -66,7 +62,7 @@ class Match:
         self.string: str = match.string
 
         # The regex groups
-        # self.groups: List[str]
+        self.groups: List[str] = match.groups()
 
         # Unaltered caputured string
         self.original_capture: str = match.group(0)
@@ -92,6 +88,8 @@ class Match:
             + bcolors.OKBLUE
             + substitution_processed
             + bcolors.ENDC
+            + "\n",
+            end="",
         )
 
     @staticmethod
@@ -152,21 +150,28 @@ def sub_func(i: Match, substitution, ask_before, custom_conversion):
 
 
 def process_file(path, pattern, dry_run, sub_func1):
+    # TODO: avoid printing when not substitution,
+    # or when custom_conversion returns the same as original
     print(
-        "\n"
-        + bcolors.UNDERLINE
+        bcolors.UNDERLINE
         + bcolors.BOLD
         + bcolors.OKGREEN
         + path
         + bcolors.ENDC
+        + "\n",
+        end="",
     )
     with open(path, "rt") as file:
         file_str = file.read()
         res_sub, n_sub = re.subn(pattern, sub_func1, file_str)
 
-    if not n_sub:
+    if n_sub:
+        # add a blank line if match
+        print("\n", end="")
+    else:
         # delete last printed line (name of file)
-        print("\033[F" + "\033[K")
+        print("\033[F" + "\033[K", end="")
+
     if not dry_run and n_sub:
         with open(path, "wt") as file:
             file.write(res_sub)
@@ -185,6 +190,7 @@ def get_arguments():
     return args.target, args.dry_run, args.config_file
 
 
+# name it ADVANCED_SUBSTITUTION?
 def main(target, dry_run, config_file, custom_conversion=None):
     if config_file:
         with open(config_file) as file:
