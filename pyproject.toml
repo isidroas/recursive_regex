@@ -1,9 +1,37 @@
+[project]
+name = "recursive-regex"
+version = "0.1.1"
+authors = [
+        {name="Isidro Arias", email="isidroariass@hotmail.es"},
+]
+description = "Search and substitute an regular expresion recursively in a directory."
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "PyYAML",
+]
+requires-python = ">=3.6"
+
+[project.urls]
+Repository = "https://github.com/isidroas/recursive_regex"
+Issues = "https://github.com/isidroas/recursive_regex/issues"
+
+
+
 [build-system]
 requires = [
     "setuptools>=42",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[project.scripts]
+recursive_regex = "recursive_regex.recursive_regex:run"
+recursive_regex_sample_config = "recursive_regex.sample_config:sample_config"
 
 [tool.black]
 line-length = 79
