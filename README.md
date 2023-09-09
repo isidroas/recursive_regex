@@ -2,7 +2,7 @@
 
 # Recursive REGEX
 
-Search an regular expresion recursively in a folder and substitute.
+Search a regular expresion recursively in a folder and substitute.
 
 ## Installation
 ```bash
