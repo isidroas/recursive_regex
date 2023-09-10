@@ -175,8 +175,8 @@ def get_arguments():
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--case-insensitive", action="store_true")
-    parser.add_argument("--exclude-file", action="append", dest='excuded_files')
-    parser.add_argument("--exclude-dir", action="append", dest='excuded_files')
+    parser.add_argument("--exclude-file", action="append", dest='exclude_files', nargs='*', default=[])
+    parser.add_argument("--exclude-dir", action="append", dest='exclude_dirs', nargs='*', default=[])
     args = parser.parse_args()
     return vars(args)
 
@@ -215,7 +215,7 @@ def run():
     """
     Run from command line
     """
-    main(*get_arguments())
+    main(**get_arguments())
 
 
 if __name__ == "__main__":
