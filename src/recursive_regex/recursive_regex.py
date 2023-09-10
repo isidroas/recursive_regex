@@ -34,24 +34,11 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-class Parameters:
-    def __init__(
-        self,
-        pattern,
-        substitution,
-        case_insensitive=False,
-        exclude_dirs=[],
-        exclude_files=[],
-        ask_before=False,
-    ):
-        self.pattern: str = pattern
-        self.substitution: str = substitution
-        self.case_insensitive: bool = case_insensitive
-        self.exclude_dirs: List[str] = exclude_dirs
-        self.exclude_files: List[str] = exclude_files
-        self.ask_before: bool = ask_before
 
 
+# TODO: inherit to
+#  - avaoid boilerplate redirect
+#  - avoid inventing
 class Match:
     def __init__(self, match: re.Match):
 
@@ -128,7 +115,9 @@ class Match:
         return len(str_.split("\n"))
 
 
-def sub_func(i: Match, substitution, ask_before, custom_conversion):
+# TODO:
+# how to express two excluyent options: subsitituion (str) and custome_conversion (callable)?
+def sub_func(i: Match, substitution, ask_before, custom_conversion=None):
 
     # if CUSTOM_POSTFILTER:
     #    if not CUSTOM_POSTFILTER(i):
@@ -179,40 +168,39 @@ def process_file(path, pattern, dry_run, sub_func1):
 
 def get_arguments():
     parser = argparse.ArgumentParser(description="Recursive REGEX")
+    parser.add_argument("pattern")
+    parser.add_argument("substitution")
     parser.add_argument(
         "target", help="path of the file or directory to search"
     )
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument(
-        "--config-file", "-c", help="yaml file where config is stored"
-    )
+    parser.add_argument("--case-insensitive", action="store_true")
+    parser.add_argument("--exclude-file", action="append", metavar='excuded_files')
+    parser.add_argument("--exclude-dir")
     args = parser.parse_args()
     return args.target, args.dry_run, args.config_file
 
 
 # name it ADVANCED_SUBSTITUTION?
-def main(target, dry_run, config_file, custom_conversion=None):
-    if config_file:
-        with open(config_file) as file:
-            param_dict = yaml.safe_load(file)
+def main(pattern, substitution,target,case_insensitive=False, dry_run=False, custom_conversion=None,exclude_dirs=[],exclude_files=[],ask_before=False):
 
-    params = Parameters(**param_dict)
-    if params.case_insensitive:
-        pattern = re.compile(params.pattern, flags=re.IGNORECASE)
+    if case_insensitive:
+        pattern = re.compile(pattern, flags=re.IGNORECASE)
     else:
-        pattern = re.compile(params.pattern)
+        pattern = re.compile(pattern)
 
     def sub_func_wrap(i):
         return sub_func(
-            Match(i), params.substitution, params.ask_before, custom_conversion
+            Match(i), substitution, ask_before, custom_conversion
         )
 
     if os.path.isdir(target):
         for root, subdirs, files in os.walk(target):
-            if any([e in root for e in params.exclude_dirs]):
+            if any([e in root for e in exclude_dirs]):
+                # TODO: not efficient. also accept glob
                 continue
             for f in files:
-                if any([e in f for e in params.exclude_files]):
+                if any([e in f for e in exclude_files]):
                     continue
                 process_file(
                     os.path.join(root, f), pattern, dry_run, sub_func_wrap

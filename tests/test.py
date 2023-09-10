@@ -6,7 +6,5 @@ def custom_conversion(match: Match) -> str:
 
 
 # def main(target, dry_run, config_file, custom_conversion = None):
-main("./d1", True, "./rere_parameters.yaml")
-main(
-    "./d1", True, "./rere_parameters.yaml", custom_conversion=custom_conversion
-)
+main("hola", "adios", "./d1", dry_run = True)
+main("hola", "adios", "./d1", dry_run = True, custom_conversion=custom_conversion)
