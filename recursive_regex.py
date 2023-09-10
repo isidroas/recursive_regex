@@ -172,12 +172,10 @@ def get_arguments():
     parser.add_argument("pattern")
     parser.add_argument("substitution")
     parser.add_argument(
-        "target", help="path of the file or directory to search"
+        "target", help="path of the file or directory to search", nargs='*'
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--case-insensitive", action="store_true")
-    parser.add_argument("--exclude-file", dest='exclude_files', default=[], action='append')
-    parser.add_argument("--exclude-dir", dest='exclude_dirs', default=[], action='append')
     args = parser.parse_args()
     return vars(args)
 
@@ -195,21 +193,11 @@ def main(pattern, substitution,target,case_insensitive=False, dry_run=False, cus
             Match(i), substitution, ask_before, custom_conversion
         )
 
-    if os.path.isdir(target):
-        for root, subdirs, files in os.walk(target):
-            print(root)
-            if any(fnmatch(root,e) for e in exclude_dirs):
-                continue
-            for f in files:
-                if any(fnmatch(f,e) for e in exclude_files):
-                    continue
-                process_file(
-                    os.path.join(root, f), pattern, dry_run, sub_func_wrap
-                )
-    elif os.path.isfile(target):
-        process_file(target, pattern, dry_run, sub_func_wrap)
-    else:
-        raise FileNotFoundError(target)
+    print(target)
+    for path in target:
+        process_file(
+            path, pattern, dry_run, sub_func_wrap
+        )
 
 
 def run():
