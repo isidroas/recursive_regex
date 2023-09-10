@@ -175,10 +175,10 @@ def get_arguments():
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--case-insensitive", action="store_true")
-    parser.add_argument("--exclude-file", action="append", metavar='excuded_files')
-    parser.add_argument("--exclude-dir")
+    parser.add_argument("--exclude-file", action="append", dest='excuded_files')
+    parser.add_argument("--exclude-dir", action="append", dest='excuded_files')
     args = parser.parse_args()
-    return args.target, args.dry_run, args.config_file
+    return vars(args)
 
 
 # name it ADVANCED_SUBSTITUTION?
@@ -205,8 +205,10 @@ def main(pattern, substitution,target,case_insensitive=False, dry_run=False, cus
                 process_file(
                     os.path.join(root, f), pattern, dry_run, sub_func_wrap
                 )
-    else:
+    elif os.path.isfile(target):
         process_file(target, pattern, dry_run, sub_func_wrap)
+    else:
+        raise FileNotFoundError(target)
 
 
 def run():
