@@ -175,8 +175,8 @@ def get_arguments():
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--case-insensitive", action="store_true")
-    parser.add_argument("--exclude-file", action="append", dest='exclude_files', nargs='*', default=[])
-    parser.add_argument("--exclude-dir", action="append", dest='exclude_dirs', nargs='*', default=[])
+    parser.add_argument("--exclude-file", dest='exclude_files', default=[], action='append')
+    parser.add_argument("--exclude-dir", dest='exclude_dirs', default=[], action='append')
     args = parser.parse_args()
     return vars(args)
 
@@ -200,7 +200,9 @@ def main(pattern, substitution,target,case_insensitive=False, dry_run=False, cus
                 # TODO: not efficient. also accept glob
                 continue
             for f in files:
-                if any([e in f for e in exclude_files]):
+                print(f)
+                print(exclude_files)
+                if f in exclude_files:
                     continue
                 process_file(
                     os.path.join(root, f), pattern, dry_run, sub_func_wrap
