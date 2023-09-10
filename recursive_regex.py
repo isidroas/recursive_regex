@@ -4,6 +4,7 @@ import yaml
 import argparse
 from typing import List
 from fnmatch import fnmatch
+import sys
 
 
 # def custom_postfilter(match_obj: re.Match) -> bool:
@@ -193,7 +194,8 @@ def main(pattern, substitution,target,case_insensitive=False, dry_run=False, cus
             Match(i), substitution, ask_before, custom_conversion
         )
 
-    print(target)
+    if not target:
+        target = (p.rstrip() for p in sys.stdin.readlines())
     for path in target:
         process_file(
             path, pattern, dry_run, sub_func_wrap
