@@ -3,6 +3,7 @@ import os
 import yaml
 import argparse
 from typing import List
+from fnmatch import fnmatch
 
 
 # def custom_postfilter(match_obj: re.Match) -> bool:
@@ -200,9 +201,7 @@ def main(pattern, substitution,target,case_insensitive=False, dry_run=False, cus
                 # TODO: not efficient. also accept glob
                 continue
             for f in files:
-                print(f)
-                print(exclude_files)
-                if f in exclude_files:
+                if any(fnmatch(f,e) for e in exclude_files):
                     continue
                 process_file(
                     os.path.join(root, f), pattern, dry_run, sub_func_wrap
