@@ -30,7 +30,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project.scripts]
-recursive_regex = "recursive_regex.recursive_regex:run"
+recursive_regex = "recursive_regex:run"
 
 [tool.black]
 line-length = 79

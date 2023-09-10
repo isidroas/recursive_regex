@@ -1,4 +1,4 @@
-from recursive_regex.recursive_regex import main, Match
+from recursive_regex import main, Match
 
 
 def custom_conversion(match: Match) -> str:
