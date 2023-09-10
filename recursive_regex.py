@@ -197,8 +197,8 @@ def main(pattern, substitution,target,case_insensitive=False, dry_run=False, cus
 
     if os.path.isdir(target):
         for root, subdirs, files in os.walk(target):
-            if any([e in root for e in exclude_dirs]):
-                # TODO: not efficient. also accept glob
+            print(root)
+            if any(fnmatch(root,e) for e in exclude_dirs):
                 continue
             for f in files:
                 if any(fnmatch(f,e) for e in exclude_files):
