@@ -26,6 +26,7 @@ class bcolors:
 # TODO: inherit to
 #  - avaoid boilerplate redirect
 #  - avoid inventing
+# problem: the re.sub only passes re.Match
 class Match:
     def __init__(self, match: re.Match):
 
@@ -53,7 +54,7 @@ class Match:
             pre + bcolors.WARNING + self.original_capture + bcolors.ENDC + suc
         )
 
-        line = str(self._getNumberOfLines(self.string[: self.init_pos])) + ": "
+        line = str(self._number_of_lines(self.string[: self.init_pos])) + ": "
         line_str = bcolors.FAIL + bcolors.BOLD + line + bcolors.ENDC
 
         print(line_str + res)
@@ -98,7 +99,7 @@ class Match:
         return successor
 
     @staticmethod
-    def _getNumberOfLines(str_):
+    def _number_of_lines(str_):
         return len(str_.split("\n"))
 
 
@@ -158,7 +159,6 @@ def get_arguments():
     return vars(args)
 
 
-# name it ADVANCED_SUBSTITUTION?
 def main(pattern, substitution,target,case_insensitive=False, dry_run=False, exclude_dirs=[],exclude_files=[],ask_before=False):
 
     if case_insensitive:
