@@ -4,7 +4,6 @@ from typing import List
 import sys
 
 
-
 # TODO: there is too many line breaks printed in standard output
 class bcolors:
     HEADER = "\033[95m"
@@ -18,15 +17,12 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-
-
 # TODO: inherit to
 #  - avaoid boilerplate redirect
 #  - avoid inventing
 # problem: the re.sub only passes re.Match
 class Match:
     def __init__(self, match: re.Match):
-
         self.init_pos: int = match.start()
         self.end_pos: int = match.end()
 
@@ -101,7 +97,14 @@ class Match:
 
 
 class Substitutor:
-    def __init__(self, pattern, substitution: str, ask_before: bool = False, case_insensitive = False, dry_run = False):
+    def __init__(
+        self,
+        pattern,
+        substitution: str,
+        ask_before: bool = False,
+        case_insensitive=False,
+        dry_run=False,
+    ):
         self.substitution = substitution
         self.ask_before = ask_before
         self.dry_run = dry_run
@@ -151,14 +154,12 @@ class Substitutor:
         return substitution_processed
 
 
-
-
 def get_arguments():
     parser = argparse.ArgumentParser(description="Recursive REGEX")
     parser.add_argument("pattern")
     parser.add_argument("substitution")
     parser.add_argument(
-        "target", help="path of the file or directory to search", nargs='*'
+        "target", help="path of the file or directory to search", nargs="*"
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--case-insensitive", action="store_true")
@@ -166,8 +167,7 @@ def get_arguments():
     return vars(args)
 
 
-def main(pattern, substitution,target,**kwargs):
-
+def main(pattern, substitution, target, **kwargs):
     if not target:
         target = (p.rstrip() for p in sys.stdin.readlines())
 
