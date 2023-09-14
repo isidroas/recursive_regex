@@ -112,28 +112,18 @@ class Substitutor:
             self.pattern = re.compile(pattern, flags=re.IGNORECASE)
         else:
             self.pattern = re.compile(pattern)
+        self._first_sub = True
+        self._path = None
 
     def process_file(self, path):
-        # TODO: avoid printing when not substitution,
-        # or when custom_conversion returns the same as original
-        print(
-            bcolors.UNDERLINE
-            + bcolors.BOLD
-            + bcolors.OKGREEN
-            + path
-            + bcolors.ENDC
-            + "\n",
-            end="",
-        )
+        self._first_sub = True
+        self._path = path
         with open(path, "rt") as file:
             contents_sub, n_sub = re.subn(self.pattern, self._sub, file.read())
 
         if n_sub:
             # add a blank line if match
             print("\n", end="")
-        else:
-            # delete last printed line (name of file)
-            print("\033[F" + "\033[K", end="")
 
         if not self.dry_run and n_sub:
             with open(path, "wt") as file:
@@ -143,6 +133,18 @@ class Substitutor:
         match = Match(match)
 
         substitution_processed = match.regex_substitute(self.substitution)
+
+        if self._first_sub:
+            print(
+                bcolors.UNDERLINE
+                + bcolors.BOLD
+                + bcolors.OKGREEN
+                + self._path
+                + bcolors.ENDC
+                + "\n",
+                end="",
+            )
+            self._first_sub = False
 
         match.print_context_and_substitution(substitution_processed)
 
