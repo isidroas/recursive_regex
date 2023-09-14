@@ -1,9 +1,6 @@
 import re
-import os
-import yaml
 import argparse
 from typing import List
-from fnmatch import fnmatch
 import sys
 
 
@@ -103,47 +100,57 @@ class Match:
         return len(str_.split("\n"))
 
 
-def sub_func(i: Match, substitution, ask_before):
+class Substitutor:
+    def __init__(self, pattern, substitution: str, ask_before: bool = False, case_insensitive = False, dry_run = False):
+        self.substitution = substitution
+        self.ask_before = ask_before
+        self.dry_run = dry_run
+        if case_insensitive:
+            self.pattern = re.compile(pattern, flags=re.IGNORECASE)
+        else:
+            self.pattern = re.compile(pattern)
+
+    def process_file(self, path):
+        # TODO: avoid printing when not substitution,
+        # or when custom_conversion returns the same as original
+        print(
+            bcolors.UNDERLINE
+            + bcolors.BOLD
+            + bcolors.OKGREEN
+            + path
+            + bcolors.ENDC
+            + "\n",
+            end="",
+        )
+        with open(path, "rt") as file:
+            contents_sub, n_sub = re.subn(self.pattern, self._sub, file.read())
+
+        if n_sub:
+            # add a blank line if match
+            print("\n", end="")
+        else:
+            # delete last printed line (name of file)
+            print("\033[F" + "\033[K", end="")
+
+        if not self.dry_run and n_sub:
+            with open(path, "wt") as file:
+                file.write(contents_sub)
+
+    def _sub(self, match):
+        match = Match(match)
+
+        substitution_processed = match.regex_substitute(self.substitution)
+
+        match.print_context_and_substitution(substitution_processed)
+
+        if self.ask_before:
+            skip = input("Do this substitution? [Y/n]") == "n"
+            if skip:
+                return match.original_capture
+
+        return substitution_processed
 
 
-    substitution_processed = i.regex_substitute(substitution)
-
-    i.print_context_and_substitution(substitution_processed)
-
-    if ask_before:
-        skip = input("Do this substitution? [Y/n]") == "n"
-        if skip:
-            return i.original_capture
-
-    return substitution_processed
-
-
-def process_file(path, pattern, dry_run, sub_func1):
-    # TODO: avoid printing when not substitution,
-    # or when custom_conversion returns the same as original
-    print(
-        bcolors.UNDERLINE
-        + bcolors.BOLD
-        + bcolors.OKGREEN
-        + path
-        + bcolors.ENDC
-        + "\n",
-        end="",
-    )
-    with open(path, "rt") as file:
-        file_str = file.read()
-        res_sub, n_sub = re.subn(pattern, sub_func1, file_str)
-
-    if n_sub:
-        # add a blank line if match
-        print("\n", end="")
-    else:
-        # delete last printed line (name of file)
-        print("\033[F" + "\033[K", end="")
-
-    if not dry_run and n_sub:
-        with open(path, "wt") as file:
-            file.write(res_sub)
 
 
 def get_arguments():
@@ -159,23 +166,14 @@ def get_arguments():
     return vars(args)
 
 
-def main(pattern, substitution,target,case_insensitive=False, dry_run=False, exclude_dirs=[],exclude_files=[],ask_before=False):
-
-    if case_insensitive:
-        pattern = re.compile(pattern, flags=re.IGNORECASE)
-    else:
-        pattern = re.compile(pattern)
-
-    def sub_func_wrap(i):
-        return sub_func(
-            Match(i), substitution, ask_before)
+def main(pattern, substitution,target,**kwargs):
 
     if not target:
         target = (p.rstrip() for p in sys.stdin.readlines())
+
+    substitutor = Substitutor(pattern, substitution, **kwargs)
     for path in target:
-        process_file(
-            path, pattern, dry_run, sub_func_wrap
-        )
+        substitutor.process_file(path)
 
 
 def run():
