@@ -7,21 +7,6 @@ from fnmatch import fnmatch
 import sys
 
 
-# def custom_postfilter(match_obj: re.Match) -> bool:
-#    unchanged_string = match_obj.group(0)
-#
-#    return True
-
-# TODO: remove it? this is only useful
-# when you want aditionaly, a regex_substitution
-# CUSTOM_POSTFILTER = custom_postfilter
-# CUSTOM_POSTFILTER = None
-
-# name it ADITIONAL_FILTER ?
-
-# Sometimes is useful to not convert when it fails.
-# but in thas case, the 'original_capture' attribute could be used
-
 
 # TODO: there is too many line breaks printed in standard output
 class bcolors:
@@ -117,18 +102,10 @@ class Match:
         return len(str_.split("\n"))
 
 
-# TODO:
-# how to express two excluyent options: subsitituion (str) and custome_conversion (callable)?
-def sub_func(i: Match, substitution, ask_before, custom_conversion=None):
+def sub_func(i: Match, substitution, ask_before):
 
-    # if CUSTOM_POSTFILTER:
-    #    if not CUSTOM_POSTFILTER(i):
-    #        return i.original_capture
 
-    if custom_conversion:
-        substitution_processed = custom_conversion(i)
-    else:
-        substitution_processed = i.regex_substitute(substitution)
+    substitution_processed = i.regex_substitute(substitution)
 
     i.print_context_and_substitution(substitution_processed)
 
@@ -182,7 +159,7 @@ def get_arguments():
 
 
 # name it ADVANCED_SUBSTITUTION?
-def main(pattern, substitution,target,case_insensitive=False, dry_run=False, custom_conversion=None,exclude_dirs=[],exclude_files=[],ask_before=False):
+def main(pattern, substitution,target,case_insensitive=False, dry_run=False, exclude_dirs=[],exclude_files=[],ask_before=False):
 
     if case_insensitive:
         pattern = re.compile(pattern, flags=re.IGNORECASE)
@@ -191,8 +168,7 @@ def main(pattern, substitution,target,case_insensitive=False, dry_run=False, cus
 
     def sub_func_wrap(i):
         return sub_func(
-            Match(i), substitution, ask_before, custom_conversion
-        )
+            Match(i), substitution, ask_before)
 
     if not target:
         target = (p.rstrip() for p in sys.stdin.readlines())
