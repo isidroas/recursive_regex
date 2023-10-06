@@ -122,7 +122,6 @@ class Substitutor:
             contents_sub, n_sub = re.subn(self.pattern, self._sub, file.read())
 
         if n_sub:
-            # add a blank line if match
             print("\n", end="")
 
         if not self.dry_run and n_sub:
@@ -146,6 +145,8 @@ class Substitutor:
             )
             self._first_sub = False
 
+        # TODO: handle when substitution is equal.
+        #       For example, by skipping the print.
         match.print_context_and_substitution(substitution_processed)
 
         if self.ask_before:

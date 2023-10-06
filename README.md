@@ -2,20 +2,8 @@
 
 # Recursive REGEX
 
-Search a regular expresion recursively in a folder and substitute.
+CLI program to search a regular expresion on a file and substitute.
 
-## Installation
-```bash
-pip install recursive_regex
-```
-
-### From source
-```bash
-git clone https://github.com/isidroas/recursive_regex
-cd recursive_regex
-# Install in editable mode
-pip install -e .
-```
 
 ## Usage
 [![asciicast](https://asciinema.org/a/ZIZgLqzLaUqH13oP2VeJ7WgMf.svg)](https://asciinema.org/a/ZIZgLqzLaUqH13oP2VeJ7WgMf)
