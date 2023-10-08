@@ -1,5 +1,4 @@
 #!/bin/bash
-# TODO: copy to temp and delete
 
 dir=$(mktemp -d /tmp/regex_test_data.XXXXX)
 trap 'rm -r $dir' EXIT
