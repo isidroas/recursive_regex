@@ -4,7 +4,6 @@ from typing import List
 import sys
 
 
-# TODO: there is too many line breaks printed in standard output
 class bcolors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
@@ -18,7 +17,7 @@ class bcolors:
 
 
 # TODO: inherit to
-#  - avaoid boilerplate redirect
+#  - avoid boilerplate redirect
 #  - avoid inventing
 # problem: the re.sub only passes re.Match
 class Match:
@@ -122,6 +121,7 @@ class Substitutor:
             contents_sub, n_sub = re.subn(self.pattern, self._sub, file.read())
 
         if n_sub:
+            # this produces a blank line, even in the last file
             print("\n", end="")
 
         if not self.dry_run and n_sub:
@@ -147,6 +147,7 @@ class Substitutor:
 
         # TODO: handle when substitution is equal.
         #       For example, by skipping the print.
+        #       or by priting "(equal)"
         match.print_context_and_substitution(substitution_processed)
 
         if self.ask_before:
