@@ -165,7 +165,7 @@ def get_arguments():
         "target", help="path of the file or directory to search", nargs="*"
     )
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--case-insensitive", action="store_true")
+    parser.add_argument("--case-insensitive", "-i", action="store_true")
     args = parser.parse_args()
     return vars(args)
 
